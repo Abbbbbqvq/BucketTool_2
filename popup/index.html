@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>BucketTool_2</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+    <div id="app">
+        <h1>BucketTool_2</h1>
+        
+        <!-- 选项卡导航 -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="results">检测结果</button>
+            <button class="tab-btn" data-tab="logs">日志</button>
+            <button class="tab-btn" data-tab="blocklist">黑名单</button>
+        </div>
+
+        <!-- 1. 检测结果面板 -->
+        <div id="tab-results" class="tab-content active">
+            <div id="history-section">
+                <ul id="history-list">
+                    <!-- 检测历史项将由 JS 动态插入 -->
+                </ul>
+                <div id="no-history" style="display:none; color:#888;">暂无检测历史</div>
+            </div>
+            <button id="clear-history" title="清空所有历史">清空历史</button>
+        </div>
+
+        <!-- 2. 日志面板 -->
+        <div id="tab-logs" class="tab-content">
+            <div class="log-header">
+                <span>探测日志</span>
+                <button id="clear-logs" title="清除日志">清除</button>
+            </div>
+            <div id="log-panel">暂无日志</div>
+        </div>
+
+        <!-- 3. 黑名单面板 -->
+        <div id="tab-blocklist" class="tab-content">
+            <div class="blocklist-input-row">
+                <input type="text" id="blocklist-input" placeholder="例如 *.baidu.com 或 /regex/">
+                <button id="add-blocklist-btn">添加</button>
+            </div>
+            <ul id="blocklist-items">
+                <!-- 黑名单项由 JS 动态插入 -->
+            </ul>
+            <div id="no-blocklist" style="display:none; color:#888;">暂无黑名单规则</div>
+        </div>
+    </div>
+    <!-- 请求/响应体弹窗 -->
+    <div id="modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" id="modal-close">&times;</span>
+            <h3 id="modal-title"></h3>
+            <pre id="modal-body"></pre>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+
+</html>
