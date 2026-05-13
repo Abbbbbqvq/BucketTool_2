@@ -1,0 +1,28 @@
+{
+    "manifest_version": 3,
+    "name": "BucketTool_2",
+    "version": "0.0.1",
+    "description": "BucketTool_2 - 云存储安全检测浏览器扩展",
+    "action": {
+        "default_popup": "popup/index.html"
+    },
+    "icons": {
+        "128": "icons/tupian.png"
+    },
+    "permissions": [
+        "storage",
+        "webRequest",
+        "contextMenus"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "background/background.js",
+        "type": "module"
+    },
+    "options_ui": {
+        "page": "options/options.html",
+        "open_in_tab": true
+    }
+}
