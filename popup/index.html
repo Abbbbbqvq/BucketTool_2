@@ -9,13 +9,18 @@
 
 <body>
     <div id="app">
-        <h1>BucketTool_2</h1>
-        
         <!-- 选项卡导航 -->
         <div class="tabs">
             <button class="tab-btn active" data-tab="results">检测结果</button>
             <button class="tab-btn" data-tab="logs">日志</button>
             <button class="tab-btn" data-tab="blocklist">黑名单</button>
+            <div class="detection-switch">
+                <label class="switch">
+                    <input type="checkbox" id="detection-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span class="switch-label">启用检测</span>
+            </div>
         </div>
 
         <!-- 1. 检测结果面板 -->

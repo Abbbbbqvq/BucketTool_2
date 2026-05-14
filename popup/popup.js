@@ -10,6 +10,7 @@ const modalBody = document.getElementById('modal-body');
 const modalClose = document.getElementById('modal-close');
 const logPanel = document.getElementById('log-panel');
 const clearLogsBtn = document.getElementById('clear-logs');
+const detectionToggle = document.getElementById('detection-toggle');
 
 // 选项卡切换逻辑
 const tabBtns = document.querySelectorAll('.tab-btn');
@@ -478,6 +479,19 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // 初始化黑名单面板
     loadBlocklist();
+
+    // 初始化检测开关状态
+    chrome.storage.local.get(['detectionEnabled'], (res) => {
+        const enabled = res.detectionEnabled !== undefined ? res.detectionEnabled : true;
+        detectionToggle.checked = enabled;
+    });
+
+    // 监听检测开关变化
+    detectionToggle.addEventListener('change', () => {
+        const enabled = detectionToggle.checked;
+        chrome.storage.local.set({ detectionEnabled: enabled });
+        chrome.runtime.sendMessage({ type: 'set-detection', enabled });
+    });
 
     // 仍保留向 background 发送 clear-badge 消息，兼容 service worker
     if (chrome && chrome.runtime && chrome.runtime.sendMessage) {

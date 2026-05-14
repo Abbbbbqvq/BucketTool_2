@@ -19,6 +19,7 @@ const requestHeadersCache = new Map();
 // 请求队列与速率控制
 let taskQueue = [];
 let isProcessing = false;
+let detectionEnabled = true; // 全局检测开关标志
 
 async function dynamicDelay(lastDuration) {
     const delay = lastDuration ? Math.min(Math.max(lastDuration * 2, 200), 3000) : 200;
@@ -30,6 +31,13 @@ async function processQueue() {
     isProcessing = true;
 
     while (taskQueue.length > 0) {
+        // 如果检测被关闭，清空队列并退出
+        if (!detectionEnabled) {
+            addLog('[系统] 检测已关闭，清空探测队列');
+            taskQueue = [];
+            break;
+        }
+
         const { url, headers } = taskQueue.shift();
         const start = Date.now();
         
@@ -249,6 +257,10 @@ chrome.webRequest.onCompleted.addListener(
         // 跳过扩展自身和非 http/https 请求
         if (!url.startsWith('http://') && !url.startsWith('https://')) return;
         if (details.tabId < 0) return;
+        
+        // 如果检测未启用，直接跳过
+        if (!detectionEnabled) return;
+        
         chrome.storage.local.get(['bucketVulHistory', 'flagAcl', 'flagPolicy', 'detectBlacklist'], async (res) => {
             let history = res.bucketVulHistory || [];
             const aclFlag = res.flagAcl ?? true;
@@ -333,6 +345,13 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 // 新增：接收 log.html 发来的手动检测请求
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message && message.type === 'manual-detect') {
+        // 如果检测未启用，拒绝手动检测
+        if (!detectionEnabled) {
+            await openLogWindow();
+            sendLog('检测已关闭，请先在 popup 中启用检测');
+            return;
+        }
+        
         let targetUrl = message.vulUrl;
         if (!targetUrl) {
             sendLog('未输入URL，检测取消');
@@ -451,5 +470,16 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         const pattern = message.pattern;
         blocklist = blocklist.filter(item => item.pattern !== pattern);
         chrome.storage.local.set({ bucketBlocklist: blocklist });
+    }
+    // 处理检测开关状态变更
+    if (message && message.type === 'set-detection') {
+        detectionEnabled = message.enabled;
+        addLog(`[系统] 检测功能已${detectionEnabled ? '启用' : '关闭'}`);
+        
+        // 如果检测被关闭，清空队列
+        if (!detectionEnabled && taskQueue.length > 0) {
+            addLog(`[系统] 清空 ${taskQueue.length} 个待探测任务`);
+            taskQueue = [];
+        }
     }
 });
